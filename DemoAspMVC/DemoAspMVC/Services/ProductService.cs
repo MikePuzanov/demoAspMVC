@@ -6,7 +6,7 @@ public class ProductService : BaseService, IProductService
 {
     private readonly IHttpClientFactory _clientFactory;
     
-    public ProductService(IHttpClientFactory httpClient, IHttpClientFactory clientFactory) : base(httpClient)
+    public ProductService(IHttpClientFactory clientFactory) : base(clientFactory)
     { 
         _clientFactory = clientFactory;
     }
@@ -37,7 +37,7 @@ public class ProductService : BaseService, IProductService
         {
             ApiType = Cfg.ApiType.POST,
             Data = productDto,
-            Url = Cfg.ProductApiBase + "/api/products",
+            Url = Cfg.ProductApiBase + "/api/products/",
             AccesToken = ""
         });
     }

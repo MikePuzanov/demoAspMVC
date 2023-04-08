@@ -16,51 +16,49 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
         modelBuilder.Entity<Product>().HasData(new Product
         {
             Id = 1,
-            Name = "",
-            Price = 13,
-            Description = "",
+            Name = "Молоток",
+            Price = 8,
+            Description = "Строительный инструмент",
             ImageUrl = "",
-            CategoryName = "",
+            CategoryName = "Инструмент"
         });
         modelBuilder.Entity<Product>().HasData(new Product
         {
             Id = 2,
-            Name = "",
-            Price = 13,
-            Description = "",
+            Name = "Отвертка",
+            Price = 5,
+            Description = "Строительный инструмент",
             ImageUrl = "",
-            CategoryName = "",
+            CategoryName = "Инструмент"
         });
         modelBuilder.Entity<Product>().HasData(new Product
         {
             Id = 3,
-            Name = "",
-            Price = 13,
-            Description = "",
+            Name = "Посуда",
+            Price = 14,
+            Description = "Кухонные приборы",
             ImageUrl = "",
-            CategoryName = "",
+            CategoryName = "Кухня"
         });
         modelBuilder.Entity<Product>().HasData(new Product
         {
             Id = 4,
-            Name = "",
-            Price = 13,
-            Description = "",
+            Name = "Яблоко",
+            Price = 7,
+            Description = "Еда",
             ImageUrl = "",
-            CategoryName = "",
+            CategoryName = "Фрукты"
         });
-        modelBuilder.Entity<Product>().HasData(new Product
-        {
+        modelBuilder.Entity<Product>().HasData(new Product {
             Id = 5,
-            Name = "",
-            Price = 13,
-            Description = "",
+            Name = "Огурец",
+            Price = 4,
+            Description = "Еда",
             ImageUrl = "",
-            CategoryName = "",
+            CategoryName = "Овощ" 
         });
     }
 }

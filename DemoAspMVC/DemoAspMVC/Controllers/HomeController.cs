@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using DemoAspMVC.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DemoAspMVC.Controllers;
 
@@ -16,6 +17,18 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         return View();
+    }
+    
+    
+    public IActionResult Login()
+    {
+        return RedirectToAction(nameof(Index));
+    }
+    
+    [Authorize]
+    public IActionResult Logout()
+    {
+        return SignOut("Cookies", "iodc");
     }
 
     public IActionResult Privacy()

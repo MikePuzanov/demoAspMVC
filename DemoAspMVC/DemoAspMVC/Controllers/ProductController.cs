@@ -1,5 +1,6 @@
 using DemoAspMVC.Models;
 using DemoAspMVC.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -13,6 +14,7 @@ public class ProductController : Controller
     {
         _productService = productService;
     }
+
 
     public async Task<IActionResult> ProductIndex()
     {
@@ -45,6 +47,7 @@ public class ProductController : Controller
         return View(model);
     }
     
+    //[Authorize]
     public async Task<IActionResult> ProductEdit(long productId)
     {
         var response = await _productService.GetProductByIdAsync<ResponseDTO>(productId);
@@ -59,6 +62,7 @@ public class ProductController : Controller
     
     [HttpPost]
     [ValidateAntiForgeryToken]
+    //[Authorize]
     public async Task<IActionResult> ProductEdit(ProductDTO model)
     {
         if (ModelState.IsValid)
@@ -71,7 +75,21 @@ public class ProductController : Controller
         }
         return View(model);
     }
+    
+    public async Task<IActionResult> ProductDelete(long productId)
+    {
+        var response = await _productService.GetProductByIdAsync<ResponseDTO>(productId);
+        if (response is { IsSuccess: true })
+        {
+            var model = JsonConvert.DeserializeObject<ProductDTO>(Convert.ToString(response.Result));
+            return View(model);
+        }
 
+        return NotFound();
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> ProductDelete(ProductDTO model)
     {
         var response = await _productService.DeleteProductAsync<ResponseDTO>(model.Id);
@@ -82,6 +100,4 @@ public class ProductController : Controller
 
         return View(model);
     }
-    
-
 }
