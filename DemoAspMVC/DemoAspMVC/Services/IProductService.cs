@@ -4,9 +4,9 @@ namespace DemoAspMVC.Services;
 
 public interface IProductService : IBaseService
 {
-    Task<T> CreateProductAsync<T>(ProductDTO productDto);
-    Task<T> DeleteProductAsync<T>(long id);
-    Task<T> GetAllProductAsync<T>();
-    Task<T> GetProductByIdAsync<T>(long id);
-    Task<T> UpdateProductAsync<T>(ProductDTO productDto);
+    Task<T> CreateProductAsync<T>(ProductDTO productDto, string token);
+    Task<T> DeleteProductAsync<T>(long id, string token);
+    Task<T> GetAllProductAsync<T>(string token);
+    Task<T> GetProductByIdAsync<T>(long id, string token);
+    Task<T> UpdateProductAsync<T>(ProductDTO productDto, string token);
 }

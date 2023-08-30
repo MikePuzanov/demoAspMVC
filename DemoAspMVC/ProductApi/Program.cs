@@ -11,33 +11,33 @@ using ProductApi.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var authSettings  = builder.Configuration.GetSection("Auth").Get<AuthOptions>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
     {
-        options.Authority = "http://localhost:5230/";
-        options.RequireHttpsMetadata = false;
+        options.Authority = "http://localhost:5247/";
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidIssuer = authSettings.Issuer,
-
-            ValidateAudience = true,
-            ValidAudience = authSettings.Audience,
-
-            ValidateLifetime = true,
-
-            IssuerSigningKey = authSettings.GetSymmetricSecuriryKey(),
-            ValidateIssuerSigningKey = true
+            ValidateAudience = false
         };
+        options.RequireHttpsMetadata = false;
     });
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ApiScope", policy =>
     {
         policy.RequireAuthenticatedUser();
         policy.RequireClaim("scope", "demo");
+    });
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     });
 });
 
@@ -80,9 +80,6 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 
-/*var context = app.Services.CreateScope().ServiceProvider.GetRequiredService<ApplicationDbContext>();
-SeedData.SeedDatabase(context);*/
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -90,6 +87,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
+using ProductApi.Models.DTO;
 
 namespace AccountApi.Controllers;
 
@@ -20,9 +21,11 @@ public class AccountController : ControllerBase
     private readonly IUserService _userService;
     private readonly IOptions<AuthOptions> _options;
     private readonly IMapper _mapper;
+    private ResponseDTO _response;
 
     public AccountController(ApplicationDbContext context, IUserService userService, IOptions<AuthOptions> options, IMapper mapper)
     {
+        _response = new ResponseDTO();
         _context = context;
         _userService = userService;
         _options = options;
@@ -31,22 +34,26 @@ public class AccountController : ControllerBase
     
     [Route("login")]
     [HttpPost]
-    public async Task<IActionResult> Login([FromBody]Login model)
+    public async Task<object> Login([FromBody]Login model)
     {
-        var userDto = await _userService.AuthenticateUser(model.Email, model.Password);
-        var user = _mapper.Map<User>(userDto);
-        if (user != null)
+        try
         {
-            var token = GenerateJwt.GenerateJwtToken(user, _options);
-
-            return Ok(new
+            var userDto = await _userService.AuthenticateUser(model.Email, model.Password);
+            var user = _mapper.Map<User>(userDto);
+            if (user != null)
             {
-                access_token = token
-            });
+                var token = GenerateJwt.GenerateJwtToken(user, _options);
+
+                _response.Result = token;
+            }
+            //return Unauthorized();
+        }
+        catch (Exception e)
+        {
+            _response.IsSuccess = false;
+            _response.ErrorMessages = new List<string>() { e.ToString() };
         }
 
-        return Unauthorized();
+        return _response;
     }
-    
-    
 }

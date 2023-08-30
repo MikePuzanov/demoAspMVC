@@ -1,9 +1,8 @@
 using Demo.Utils;
 using DemoAspMVC;
 using DemoAspMVC.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,33 +10,53 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient<IProductService, ProductService>();
 Cfg.ProductApiBase = builder.Configuration.GetSection("ServiceUrl").GetSection("ProductApi").Value;
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddHttpClient<IAccountService, AccountService>();
+
+/*builder.Services.AddHttpClient<IAccountService, AccountService>();
 Cfg.AccountApiBase = builder.Configuration.GetSection("ServiceUrl").GetSection("AccountApi").Value;
-builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAccountService, AccountService>();*/
+builder.Services.AddHttpClient<IAuthService, AuthService>();
+Cfg.AccountApiBase = builder.Configuration.GetSection("ServiceUrl").GetSection("AuthApi").Value;
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+
+
+
+
 
 
 var authSettings  = builder.Configuration.GetSection("Auth").Get<AuthOptions>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(options =>
     {
-        options.Authority = "http://localhost:5230/";
+        options.DefaultScheme = "Cookies";
+        options.DefaultChallengeScheme = "oidc";
+    })
+    .AddCookie("Cookies", options => options.ExpireTimeSpan = TimeSpan.FromMinutes(10))
+    .AddOpenIdConnect("oidc", options =>
+    {
+        IdentityModelEventSource.ShowPII = true;
         options.RequireHttpsMetadata = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = authSettings.Issuer,
+        options.Authority = Cfg.AccountApiBase;
+        options.GetClaimsFromUserInfoEndpoint = true;
+        options.ClientId = "demo";
+        options.ClientSecret = "secret";
+        options.ResponseType = "code";
 
-            ValidateAudience = true,
-            ValidAudience = authSettings.Audience,
-
-            ValidateLifetime = true,
-
-            IssuerSigningKey = authSettings.GetSymmetricSecuriryKey(),
-            ValidateIssuerSigningKey = true
-        };
+        
+        options.Configuration = new OpenIdConnectConfiguration();
+        options.TokenValidationParameters.NameClaimType = "name";
+        options.TokenValidationParameters.RoleClaimType = "role";
+        options.Scope.Add("demo");
+        options.SaveTokens = true;
     });
-builder.Services.AddAuthorization();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiScope", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "demo");
+    });
+});
 
 var app = builder.Build();
 

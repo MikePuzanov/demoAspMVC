@@ -2,9 +2,9 @@ using DemoAspMVC.Models;
 
 namespace DemoAspMVC.Services;
 
-public interface IAccountService : IBaseService
+public interface IAuthService : IBaseService
 {
-    Task<T> LoginUserAsync<T>(Login model, string token);
+    Task<T> LoginUserAsync<T>(LoginAuth model, string token);
     Task<T> RegisterUserAsync<T>(string token);
     Task<T> LogoutUserAsync<T>(string token);
 }

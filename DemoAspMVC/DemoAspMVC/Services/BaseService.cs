@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Serialization;
 using DemoAspMVC.Models;
@@ -29,6 +30,11 @@ public class BaseService : IBaseService
             if (apiRequest.Data != null)
             {
                 message.Content = new StringContent(JsonConvert.SerializeObject(apiRequest.Data), Encoding.UTF8, "application/json");
+            }
+
+            if (!string.IsNullOrEmpty(apiRequest.AccesToken))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiRequest.AccesToken);
             }
 
             HttpResponseMessage apiResponse = null;

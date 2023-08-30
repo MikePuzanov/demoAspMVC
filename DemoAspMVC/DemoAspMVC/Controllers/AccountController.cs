@@ -2,15 +2,16 @@ using DemoAspMVC.Models;
 using DemoAspMVC.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace DemoAspMVC.Controllers;
 
-public class AuthController : Controller
+public class AccountController : Controller
 {
-    private readonly IAuthService _authService;
-    public AuthController(IAuthService authService)
+    private readonly IAccountService _accountService;
+    public AccountController(IAccountService accountService)
     {
-        _authService = authService;
+        _accountService = accountService;
     }
     
     public async Task<IActionResult> Login()
@@ -20,10 +21,10 @@ public class AuthController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginAuth model)
+    public async Task<IActionResult> Login(Login model)
     {
         var accessToken = await HttpContext.GetTokenAsync("access_token");
-        var response = await _authService.LoginUserAsync<ResponseDTO>(model, accessToken);
+        var response = await _accountService.LoginUserAsync<ResponseDTO>(model, accessToken);
         accessToken = await HttpContext.GetTokenAsync("access_token");
         if (response is { IsSuccess: true })
         {

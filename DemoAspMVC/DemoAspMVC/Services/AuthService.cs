@@ -2,17 +2,16 @@ using DemoAspMVC.Models;
 
 namespace DemoAspMVC.Services;
 
-public class AccountService : BaseService, IAccountService
+public class AuthService : BaseService, IAuthService
 {
     private readonly IHttpClientFactory _clientFactory;
     
-    public AccountService(IHttpClientFactory clientFactory) : base(clientFactory)
-    { 
+    public AuthService(IHttpClientFactory httpClient, IHttpClientFactory clientFactory) : base(httpClient)
+    {
         _clientFactory = clientFactory;
     }
 
-
-    public async Task<T> LoginUserAsync<T>(Login model, string token)
+    public async Task<T> LoginUserAsync<T>(LoginAuth model, string token)
     {
         return await this.SendAsync<T>(new ApiRequest()
         {

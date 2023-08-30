@@ -36,8 +36,7 @@ public class ProductController : ControllerBase
     }
     
     [HttpGet]
-    //[Authorize (Roles = "User")]
-    //[Authorize (Roles = "Admin")]
+    [Authorize]
     [Route("{id}")]
     public async Task<object> Get(long id)
     {
@@ -90,6 +89,7 @@ public class ProductController : ControllerBase
     }
     
     [HttpDelete]
+    [Authorize(Roles = "Admin")]
     [Route("{id}")]
     public async Task<object> Delete(long id)
     {
